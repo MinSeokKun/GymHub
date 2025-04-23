@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/core"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_CORE")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  name     String
+  password String
+  role     Role
+
+  gyms     Gym[]      @relation("OwnerGyms") // 내가 소유한 헬스장들
+  gymAdmin GymAdmin[] // 관리자로 소속된 헬스장
+}
+
+model Gym {
+  id      Int    @id @default(autoincrement())
+  name    String
+  dbName  String
+  ownerId Int
+
+  owner  User       @relation("OwnerGyms", fields: [ownerId], references: [id])
+  admins GymAdmin[]
+}
+
+model GymAdmin {
+  id     Int @id @default(autoincrement())
+  userId Int
+  gymId  Int
+
+  user User @relation(fields: [userId], references: [id])
+  gym  Gym  @relation(fields: [gymId], references: [id])
+}
+
+enum Role {
+  superadmin
+  admin
+}
