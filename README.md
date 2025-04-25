@@ -60,6 +60,7 @@ yarn install
 
 # Core DB Prisma 클라이언트 생성
 npx prisma generate --schema=./prisma/schema.core.prisma
+npx prisma generate --schema=./prisma/schema.tenant.prisma
 ```
 
 3. 환경 변수 설정 (.env 파일 생성):
