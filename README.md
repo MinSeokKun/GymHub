@@ -57,6 +57,9 @@ cd GymHub
 npm install
 # 또는
 yarn install
+
+# Prisma 클라이언트 생성
+npx prisma generate
 ```
 
 3. 환경 변수 설정 (.env 파일 생성):
