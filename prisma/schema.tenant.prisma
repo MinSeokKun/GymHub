@@ -1,14 +1,12 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/tenant"
+  output   = "../prisma/generated/tenant"
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL_TENANT")
   directUrl = env("DATABASE_URL_TENANT")
-  // 추가된 부분: 테넌트용 마이그레이션 폴더 지정
-  migrationDirectories = ["../migrations-tenant"]
 }
 
 model Member {
