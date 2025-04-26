@@ -1,4 +1,4 @@
-import { prismaCore } from '@/src/lib/prisma-core';
+import { prismaCore } from '@/lib/prisma-core';
 import { getTenantClient, disconnectTenantClients } from './getClient';
 import { createTenantDB } from './createTenant';
 import { NextRequest } from 'next/server';

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prismaCore } from "@/src/lib/prisma-core";  // 변경됨
+import { prismaCore } from "@/lib/prisma-core";  // 변경됨
 import bcrypt from "bcrypt";
 
 export async function POST(req: Request) {
