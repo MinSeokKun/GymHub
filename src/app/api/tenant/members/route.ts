@@ -7,7 +7,7 @@ import { getTenantClient } from '@/lib/tenants/getClient';
 export async function GET(request: NextRequest) {
   try {
     // 미들웨어에서 추가한 테넌트 DB 이름 가져오기
-    const tenantDB = request.headers.get('x-tenant-db');
+    const tenantDB = request.headers.get('x-tenant-db') || 'gym_053gym';
     
     if (!tenantDB) {
       return NextResponse.json(
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // 테넌트 DB 이름 가져오기
-    const tenantDB = request.headers.get('x-tenant-db');
+    const tenantDB = request.headers.get('x-tenant-db') || 'gym_053gym';
     
     if (!tenantDB) {
       return NextResponse.json(

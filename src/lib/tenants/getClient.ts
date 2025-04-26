@@ -23,8 +23,9 @@ export async function getTenantClient(dbName: string): Promise<PrismaClient> {
     throw new Error('DATABASE_URL_TENANT_BASE 또는 DB_TEMPLATE 환경 변수가 설정되어 있지 않습니다.');
   }
 
-  // URL에서 데이터베이스 부분을 교체 (mysql://user:pass@host:port/DATABASE)
-  const connectionUrl = baseUrl.replace(/\/[^\/]*$/, `/${dbName}`);
+  // URL에서 데이터베이스 에 dbName 추가
+  const connectionUrl = baseUrl + `/${dbName}`;
+  // console.log('Tenant DB connection URL:', connectionUrl); // 디버그용
 
   // 새 Prisma 클라이언트 생성 및 연결
   const client = new PrismaClient({
