@@ -1,4 +1,4 @@
-// src/app/api-docs/page.tsx
+// src/app/api-docs/page.tsx 수정
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -22,5 +22,11 @@ export default function ApiDocs() {
     return <div className="p-8">Loading API documentation...</div>;
   }
 
-  return <SwaggerUI spec={spec} />;
+  // Strict Mode 경고를 무시하기 위해 ErrorBoundary 또는 비슷한 방법 사용 가능
+  return (
+    // React.StrictMode 비활성화 - Next.js에서는 전역 설정이므로 이 컴포넌트에서는 비활성화 불가
+    <div suppressHydrationWarning>
+      <SwaggerUI spec={spec} />
+    </div>
+  );
 }
