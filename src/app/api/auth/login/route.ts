@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
     const { password: _, ...userWithoutPassword } = user;
 
     // JWT 토큰 생성
-    const token = generateToken(userWithoutPassword);
-
+    const token = await generateToken(userWithoutPassword);
+    
     // 응답
     return NextResponse.json({
       message: '로그인 성공',

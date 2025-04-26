@@ -31,9 +31,11 @@ export async function middleware(request: NextRequest) {
   if (requiresAuth) {
     // 헤더에서 토큰 추출
     const authHeader = request.headers.get('authorization');
-    const token = extractTokenFromHeader(authHeader);
+    console.log('Authorization 헤더 전체 내용:', authHeader); // 실제 토큰 값을 로그에 출력
 
+    const token = extractTokenFromHeader(authHeader);
     if (!token) {
+      console.log('토큰이 없음 - 401 반환');
       return NextResponse.json(
         { error: '인증 토큰이 필요합니다.' },
         { status: 401 }
@@ -54,6 +56,7 @@ export async function middleware(request: NextRequest) {
     
     // 요청에 사용자 ID 추가
     const response = NextResponse.next();
+    // console.log('Setting headers:', { userId: String(userId) });
     response.headers.set('x-user-id', String(userId));
     
     // 2. 테넌트 정보 처리 (테넌트 API인 경우만)
