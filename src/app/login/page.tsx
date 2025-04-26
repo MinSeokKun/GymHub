@@ -1,40 +1,55 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '@/contexts/AuthContext';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
+import Link from 'next/link';
+
+// 폼 데이터 타입 정의
+interface FormData {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+  const onSubmit = async (data: FormData) => {
+    setError(null);
     setIsLoading(true);
     
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email: data.email, 
+          password: data.password 
+        }),
       });
       
-      const data = await response.json();
+      const responseData = await response.json();
       
       if (response.ok) {
         // AuthContext를 통해 로그인 처리
-        login(data.user, data.token);
+        login(responseData.user, responseData.token);
         
         // 대시보드로 리다이렉트
         router.push('/dashboard');
       } else {
-        setError(data.error || '로그인에 실패했습니다.');
+        setError(responseData.error || '로그인에 실패했습니다.');
       }
     } catch (error) {
       console.error('로그인 에러:', error);
@@ -45,94 +60,82 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">GymHub</h2>
-          <p className="mt-2 text-sm text-gray-600">헬스장 관리 시스템에 로그인하세요</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">GymHub</CardTitle>
+          <CardDescription className="text-center">
+            헬스장 관리 시스템에 로그인하세요
+          </CardDescription>
+        </CardHeader>
         
-        {error && (
-          <div className="p-3 bg-red-50 text-red-500 rounded-md text-sm">
-            {error}
-          </div>
-        )}
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                이메일
-              </label>
-              <input
+        <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">이메일</Label>
+              <Input
                 id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="yourname@example.com"
+                placeholder="name@example.com"
+                {...register('email', { 
+                  required: '이메일을 입력해주세요',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: '유효한 이메일 주소를 입력해주세요'
+                  } 
+                })}
+                className={errors.email ? "border-red-500" : ""}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
             
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                비밀번호
-              </label>
-              <input
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="password">비밀번호</Label>
+                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                  비밀번호를 잊으셨나요?
+                </Link>
+              </div>
+              <Input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="비밀번호를 입력하세요"
+                placeholder="••••••••"
+                {...register('password', { required: '비밀번호를 입력해주세요' })}
+                className={errors.password ? "border-red-500" : ""}
               />
+              {errors.password && (
+                <p className="text-sm text-red-500">{errors.password.message}</p>
+              )}
             </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                로그인 상태 유지
-              </label>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox id="rememberMe" {...register('rememberMe')} />
+              <Label htmlFor="rememberMe" className="text-sm">로그인 상태 유지</Label>
             </div>
-
-            <div className="text-sm">
-              <Link href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-                비밀번호를 잊으셨나요?
-              </Link>
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? '로그인 중...' : '로그인'}
-            </button>
-          </div>
-          
-          <p className="mt-3 text-center text-sm text-gray-600">
+            </Button>
+          </form>
+        </CardContent>
+        
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground">
             계정이 없으신가요?{' '}
-            <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link href="/signup" className="text-primary hover:underline">
               회원가입
             </Link>
           </p>
-        </form>
-      </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

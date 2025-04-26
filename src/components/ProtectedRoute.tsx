@@ -2,6 +2,7 @@
 import { useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading, isAuthenticated } = useAuth();
@@ -18,13 +19,9 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent align-[-0.125em]" role="status">
-            <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-              로딩 중...
-            </span>
-          </div>
-          <p className="mt-2 text-gray-600">페이지를 불러오는 중입니다...</p>
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">페이지를 불러오는 중입니다...</p>
         </div>
       </div>
     );
