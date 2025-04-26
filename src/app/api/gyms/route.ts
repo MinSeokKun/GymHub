@@ -1,5 +1,5 @@
-import { prismaCore } from "@/lib/prisma-core";
-import { createTenantDB } from "@/lib/tenants/createTenant";
+import { prismaCore } from "@/src/lib/prisma-core";
+import { createTenantDB } from "@/src/lib/tenants/createTenant";
 
 export async function POST(req: Request) {
   const { name, ownerId } = await req.json();
