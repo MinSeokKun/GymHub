@@ -1,105 +1,106 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../prisma/generated/tenant"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL_TENANT")
-  directUrl = env("DATABASE_URL_TENANT")
+  url      = env("DATABASE_URL")
 }
 
-model Member {
+model User {
   id        Int      @id @default(autoincrement())
-  name      String
-  phone     String
-  email     String?  @unique
-  birth     DateTime?
-  memo      String?  @db.Text
+  username  String   @unique
+  password  String
+  role      Role
+  trainer   Trainer? @relation(fields: [trainerId], references: [id])
+  trainerId Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  ptSessions    PTSession[]
-  attendances   Attendance[]
-  payments      Payment[]
 }
 
 model Trainer {
   id          Int      @id @default(autoincrement())
   name        String
   phone       String
-  schedule    String?  @db.Text
-  trainerNote String?  @db.Text
+  schedule    String?
+  trainerNote String?
+  user        User[]   // 연결된 User들 (1:1이지만 Prisma에서는 배열로 표현됨)
+  ptSessions  PTSession[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
 
-  ptSessions  PTSession[]
+model Member {
+  id        Int       @id @default(autoincrement())
+  name      String
+  phone     String
+  email     String?   @unique
+  birth     DateTime?
+  memo      String?
+  payments  Payment[]
+  ptSessions PTSession[]
+  attendances Attendance[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Product {
-  id              Int      @id @default(autoincrement())
-  name            String
-  ptCount         Int
-  durationMonths  Int
-  price           Int
-  type            ProductType
-  description     String?  @db.Text
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  payments        Payment[]
+  id            Int      @id @default(autoincrement())
+  name          String
+  ptCount       Int
+  durationMonths Int
+  price         Int
+  type          ProductType
+  description   String?
+  isActive      Boolean  @default(true)
+  payments      Payment[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Payment {
-  id          Int      @id @default(autoincrement()) 
-  memberId    Int
-  productId   Int
-  startDate   DateTime
-  endDate     DateTime
-  ptCount     Int
-  price       Int
-  paidAt      DateTime @default(now())
-  memo        String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  member      Member   @relation(fields: [memberId], references: [id])
-  product     Product  @relation(fields: [productId], references: [id])
+  id        Int       @id @default(autoincrement())
+  member    Member    @relation(fields: [memberId], references: [id])
+  memberId  Int
+  product   Product   @relation(fields: [productId], references: [id])
+  productId Int
+  startDate DateTime
+  endDate   DateTime
+  ptCount   Int
+  price     Int
+  paidAt    DateTime  @default(now())
+  memo      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model PTSession {
-  id           Int         @id @default(autoincrement())
-  memberId     Int
-  trainerId    Int
-  scheduledAt  DateTime
-  status       SessionStatus @default(reserved)
-  note         String?     @db.Text
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-
-  member       Member      @relation(fields: [memberId], references: [id])
-  trainer      Trainer     @relation(fields: [trainerId], references: [id])
+  id          Int       @id @default(autoincrement())
+  member      Member    @relation(fields: [memberId], references: [id])
+  memberId    Int
+  trainer     Trainer   @relation(fields: [trainerId], references: [id])
+  trainerId   Int
+  scheduledAt DateTime
+  status      PTStatus  @default(reserved)
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Attendance {
-  id          Int          @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
+  member      Member    @relation(fields: [memberId], references: [id])
   memberId    Int
   attendedAt  DateTime
   type        AttendanceType
-  memo        String?      @db.Text
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  member      Member       @relation(fields: [memberId], references: [id])
+  memo        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
-model Admin {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum Role {
+  admin
+  trainer
 }
 
 enum ProductType {
@@ -108,7 +109,7 @@ enum ProductType {
   combo
 }
 
-enum SessionStatus {
+enum PTStatus {
   reserved
   done
   canceled

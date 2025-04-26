@@ -1,4 +1,21 @@
--- 회원 테이블
+-- 사용자(User) 테이블 (admin, trainer 포함)
+CREATE TABLE IF NOT EXISTS `User` (
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(191) NOT NULL,
+  `password` VARCHAR(191) NOT NULL,
+  `name` VARCHAR(191) NOT NULL,
+  `phone` VARCHAR(191) NOT NULL,
+  `role` ENUM('admin', 'trainer') NOT NULL DEFAULT 'trainer',
+  `schedule` TEXT NULL,
+  `trainerNote` TEXT NULL,
+  `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` DATETIME(3) NOT NULL,
+  
+  UNIQUE INDEX `User_username_key`(`username`),
+  PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 회원(Member) 테이블
 CREATE TABLE IF NOT EXISTS `Member` (
   `id` INTEGER NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(191) NOT NULL,
@@ -13,20 +30,7 @@ CREATE TABLE IF NOT EXISTS `Member` (
   PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- 트레이너 테이블
-CREATE TABLE IF NOT EXISTS `Trainer` (
-  `id` INTEGER NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(191) NOT NULL,
-  `phone` VARCHAR(191) NOT NULL,
-  `schedule` TEXT NULL,
-  `trainerNote` TEXT NULL,
-  `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `updatedAt` DATETIME(3) NOT NULL,
-
-  PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- 상품 테이블
+-- 상품(Product) 테이블
 CREATE TABLE IF NOT EXISTS `Product` (
   `id` INTEGER NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(191) NOT NULL,
@@ -42,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `Product` (
   PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- 결제 테이블
+-- 결제(Payment) 테이블
 CREATE TABLE IF NOT EXISTS `Payment` (
   `id` INTEGER NOT NULL AUTO_INCREMENT,
   `memberId` INTEGER NOT NULL,
@@ -59,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `Payment` (
   PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- PT 세션 테이블
+-- PT 세션(PTSession) 테이블
 CREATE TABLE IF NOT EXISTS `PTSession` (
   `id` INTEGER NOT NULL AUTO_INCREMENT,
   `memberId` INTEGER NOT NULL,
@@ -73,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `PTSession` (
   PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- 출석 테이블
+-- 출석(Attendance) 테이블
 CREATE TABLE IF NOT EXISTS `Attendance` (
   `id` INTEGER NOT NULL AUTO_INCREMENT,
   `memberId` INTEGER NOT NULL,
@@ -86,23 +90,11 @@ CREATE TABLE IF NOT EXISTS `Attendance` (
   PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- 관리자 테이블
-CREATE TABLE IF NOT EXISTS `Admin` (
-  `id` INTEGER NOT NULL AUTO_INCREMENT,
-  `username` VARCHAR(191) NOT NULL,
-  `password` VARCHAR(191) NOT NULL,
-  `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `updatedAt` DATETIME(3) NOT NULL,
-
-  UNIQUE INDEX `Admin_username_key`(`username`),
-  PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 -- 외래 키 제약 조건 추가
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_memberId_fkey` FOREIGN KEY (`memberId`) REFERENCES `Member`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE `PTSession` ADD CONSTRAINT `PTSession_memberId_fkey` FOREIGN KEY (`memberId`) REFERENCES `Member`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE `PTSession` ADD CONSTRAINT `PTSession_trainerId_fkey` FOREIGN KEY (`trainerId`) REFERENCES `Trainer`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `PTSession` ADD CONSTRAINT `PTSession_trainerId_fkey` FOREIGN KEY (`trainerId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE `Attendance` ADD CONSTRAINT `Attendance_memberId_fkey` FOREIGN KEY (`memberId`) REFERENCES `Member`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
