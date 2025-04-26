@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { prismaCore } from '@/lib/prisma-core';
+import { prismaCore } from '@/src/lib/prisma-core';
 
 /**
  * 미들웨어 - 테넌트 정보 처리

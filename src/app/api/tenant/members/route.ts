@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTenantClient } from '@/lib/tenants/getClient';
+import { getTenantClient } from '@/src/lib/tenants/getClient';
 
 /**
  * 회원 목록 조회 API

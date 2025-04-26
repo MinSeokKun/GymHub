@@ -1,4 +1,4 @@
-import { PrismaClient } from '@/prisma/generated/tenant';
+import { PrismaClient } from '../../../prisma/generated/tenant';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
